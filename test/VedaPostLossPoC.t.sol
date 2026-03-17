@@ -35,13 +35,16 @@ interface IAccountantYieldStreaming {
     function lastStrategistUpdateTimestamp() external view returns (uint64);
     function lastVirtualSharePrice() external view returns (uint256);
 
-    function vestingState() external view returns (
-        uint128 lastSharePrice,
-        uint128 vestingGains,
-        uint128 lastVestingUpdate,
-        uint64 startVestingTime,
-        uint64 endVestingTime
-    );
+    function vestingState()
+        external
+        view
+        returns (
+            uint128 lastSharePrice,
+            uint128 vestingGains,
+            uint128 lastVestingUpdate,
+            uint64 startVestingTime,
+            uint64 endVestingTime
+        );
 }
 
 interface IBoringVault {
@@ -116,7 +119,7 @@ contract VedaPostLossPoC is Test {
         uint256 totalShares = vault.totalSupply();
         uint256 totalAssetsBefore = accountant.totalAssets();
         uint256 virtualPriceBefore = accountant.lastVirtualSharePrice();
-        (uint128 lastSharePrice, , , , ) = accountant.vestingState();
+        (uint128 lastSharePrice,,,,) = accountant.vestingState();
 
         emit log_string("========================================");
         emit log_string("  VEDA postLoss() INTEGER UNDERFLOW PoC");
@@ -153,7 +156,7 @@ contract VedaPostLossPoC is Test {
 
         // === STEP 5: Verify state is UNCHANGED after revert ===
         uint256 virtualPriceAfter = accountant.lastVirtualSharePrice();
-        (uint128 lastSharePriceAfter, , , , ) = accountant.vestingState();
+        (uint128 lastSharePriceAfter,,,,) = accountant.vestingState();
 
         assertEq(virtualPriceAfter, virtualPriceBefore, "virtualSharePrice must be unchanged");
         assertEq(uint256(lastSharePriceAfter), uint256(lastSharePrice), "lastSharePrice must be unchanged");
